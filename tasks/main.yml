@@ -1,0 +1,45 @@
+--- # tasks/main.yml
+
+- name: login to registry
+  docker_login: registry={{ docker_registry }} state=present
+                username={{ docker_username }} password={{ docker_password }}
+  become: true
+  changed_when: false
+
+- name: pull certbot repo
+  docker_container: name=certbot pull=yes state=present
+                    image={{ certbot_image }}:latest
+  become: true
+
+- name: logout of registry
+  docker_login: registry={{ docker_registry }} state=absent
+  become: true
+
+- name: install cerbot compose file
+  template: src=templates/certbot.yml.j2 dest={{ install_path }}/certbot.yml
+  become: true
+
+- name: install cerbot .env file
+  template: src=templates/env.certbot.j2 dest={{ install_path }}/.env.certbot
+            owner=root group=root mode=0700
+  become: true
+
+- name: check for existing cert
+  stat: path={{ certbot_cert_path }}
+  become: true
+  register: cert
+
+- name: run initial cerbot request
+  command: docker-compose -f {{ install_path }}/certbot.yml run --rm certbot
+  become: true
+  when: not cert.stat.exists
+
+- name: set up cerbot cron job
+  cron:
+    name: "renew cert"
+    day: "28"
+    hour: "3"
+    minute: "0"
+    user: root
+    job: /bin/docker-compose -f {{ install_path }}/certbot.yml run --rm certbot >/dev/null
+  become: true

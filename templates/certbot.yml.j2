@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  certbot:
+    image: {{ certbot_image }}:latest
+    env_file: .env.certbot
+    network_mode: host
+    volumes:
+    - {{ ssl_dir }}:/ssl
