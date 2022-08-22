@@ -19,6 +19,10 @@
   docker_login: registry={{ docker_registry }} state=absent
   become: true
 
+- name: create install path
+  file: path={{ install_path }} state=directory
+  become: true
+  
 - name: install cerbot compose file
   template: src=templates/certbot.yml.j2 dest={{ install_path }}/certbot.yml
   become: true
