@@ -1,5 +1,9 @@
 --- # tasks/main.yml
 
+- name: ensure docker daemon is started
+  service: name=docker state=started
+  become: true
+
 - name: login to registry
   docker_login: registry={{ docker_registry }} state=present
                 username={{ docker_username }} password={{ docker_password }}
