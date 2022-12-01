@@ -45,9 +45,10 @@
 - name: set up cerbot cron job
   cron:
     name: "renew cert"
-    day: "28"
+    #day: "28"
     hour: "3"
     minute: "0"
+    weekday: "3"
     user: root
     job: /bin/docker-compose -f {{ install_path }}/certbot.yml run --rm certbot >/dev/null
   become: true
