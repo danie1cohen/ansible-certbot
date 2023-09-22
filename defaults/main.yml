@@ -1,2 +1,5 @@
 ---
 # defaults file for certbot
+
+certbot_cert_path: "{{ ssl_dir }}/fullchain.pem"
+certbot_key_path: "{{ ssl_dir }}/privkey.pem"
